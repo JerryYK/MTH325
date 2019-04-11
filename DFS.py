@@ -1,71 +1,95 @@
 def find_par(tree, root, vert):
-    if vert == root or vert not in tree:
-        return []
-    else:
-        for item in tree:
-            if vert in tree[item]:
-                return item
-
-
+    for par, vertex in tree.items():
+        if vert == root:
+            return []
+        if vert in vertex:
+            return par
 def path(tree, root, vert):
-    final_path = [vert]
-    vertex = vert
-    while vertex != root and vertex != []:
-        vertex = find_par(tree, root, vertex)
-        final_path.append(vertex)
-    return final_path
-
+    result = []
+    result.append(vert)
+    if root == vert:
+        return result
+    while(vert != root):
+        for par, vertex in tree.items():
+            if vert in vertex:
+                result.append(par)
+                vert = par  
+                pass
+    return result
 
 def sub_tree(tree, root, vert):
-    items = {}
-    for item in tree:
-        if vert in path(tree,root,item):
-            items[vert] = tree[vert]
-    return items
+    result = {}
+    leaves = []
+    target = []
+    for par, vertex in tree.items():
+        if len(tree[par]) == 0:
+            leaves.append(par)
+        if vert in vertex:
+            target.append(par)
+    for leaf in leaves:
+        temp = path(tree, root, leaf)
+        if vert not in temp:
+            for note in temp:
+                if note not in target:
+                    target.append(note)
+                
+    
+    for goal in target:
+        del tree[goal]
+        
+    if vert != root and root in tree.keys():
+        del tree[root]
+    return tree
 
+def toButtom(tree, vertex):
+    if len(tree[vertex]) == 0:
+            return vertex
 
-# This is just a wrapper for the recursive method below
+    else:
+        return toButtom(tree,tree[vertex][0])
+
 def pre_DFS(tree, root):
-    return pre_DFS_unWrapped(tree, root, root)
+    result = []
+    while(True):
+        target = toButtom(tree, root)
+        if target == root:
+            break
+        parent = find_par(tree, root, target)
+        temp = path(tree, root,target)
+        temp.reverse()
+        for vertex in temp:
+            if vertex not in result:
+                result.append(vertex)
+    
+        tree[parent].remove(target)
+     
+    return result
 
 
-# This is the actual method for pre_DFS()
-def pre_DFS_unWrapped(tree, root, vert):
-    if len(tree[vert]) == 0:
-        return vert
-    else:
-        ret = [vert]
-        for child in tree[vert]:
-            ret += pre_DFS_unWrapped(tree, root, child)
-        return ret
-
-
-# This is just a wrapper for the recursive method below
 def post_DFS(tree, root):
-    return post_DFS_unWrapped(tree, root, root)
+    result = []
+    while(True):
+        target = toButtom(tree, root)
+        parent = find_par(tree, root, target)
+        if target == root:
+            break
+        if target not in result:
+            result.append(target)
+    
+        tree[parent].remove(target)
+        result.append(root)
+     
+    return result
 
+print("toButtom(A): ", toButtom({"A": ["B"], "B":["C","I"], "C":["D","E", "G"], "E":["H"], "D":[], "H":[], "G":[],"I":["J"], "J":["K", "L"], "K":[], "L":[]},"A"))
+print("path(A -> E): ", path({"A": ["B"], "B":["C","I"], "C":["D", "E", "G"], "E":["H"], "D":[], "H":[], "G":[],"I":["J"], "J":["K", "L"], "K":[], "L":[]},"A", "E"))
+print("find_par(E): ", find_par({"A": ["B"], "B":["C","I"], "C":["D", "E", "G"], "E":["H"], "D":[], "H":[], "G":[],"I":["J"], "J":["K", "L"], "K":[], "L":[]},"A", "E"))
+print("sub_tree(C): ", sub_tree({"A": ["B"], "B":["C","I"], "C":["D", "E", "G"], "E":["H"], "D":[], "H":[], "G":[],"I":["J"], "J":["K", "L"], "K":[], "L":[]}, "A", "C"))
+print("pre_DFS(A): ", pre_DFS({"A": ["B"], "B":["C","I"], "C":["D", "E", "G"], "E":["H"], "D":[], "H":[], "G":[],"I":["J"], "J":["K", "L"], "K":[], "L":[]}, "A"))
+print("post_DFS(A): ", post_DFS({"A": ["B"], "B":["C","I"], "C":["D", "E", "G"], "E":["H"], "D":[], "H":[], "G":[],"I":["J"], "J":["K", "L"], "K":[], "L":[]}, "A"))
 
-# This is the actual method for post_DFS()
-def post_DFS_unWrapped(tree, root, vert):
-    if len(tree[vert]) == 0:
-        return vert
-    else:
-        ret = []
-        for child in tree[vert]:
-            ret += pre_DFS_unWrapped(tree, root, child)
-        ret += vert
-        return ret
-
-
-print(find_par({"A": ["B", "C"], "B":["D"], "C":[], "D":[]}, "A",  "D"),
-      find_par({"A": ["B", "C"], "B":["D"], "C":[], "D":[]}, "A",  "A"))
-print("path:",path({"A": ["B", "C"], "B":["D"], "C":[], "D":[]}, "A", "D"),
-      path({"A": ["B", "C"], "B":["D"], "C":[], "D":[]}, "A",  "C"))
-print(sub_tree({"A": ["B", "C"], "B":["D"], "C":[], "D":[]}, "A", "B"),
-      sub_tree({"A": ["B", "C"], "B":["D"], "C":[], "D":[]}, "A",  "C"))
-print("pre_dfs: ", pre_DFS({"A": ["B", "C"], "B":["D"], "C":[], "D":[]}, "A"),
-      pre_DFS({"A": ["B", "C", "D"], "B":[], "C":[], "D":[]}, "A"))
-print("post_dfs: ",post_DFS({"A": ["B", "C"], "B":["D"], "C":[], "D":[]}, "A"),
-      post_DFS({"A": ["B", "C", "D"], "B":[], "C":[], "D":[]}, "A"))
-
-
+'''
+E = path({"A": ["B"], "B":["C","I"], "C":["D", "E", "G"], "E":["H"], "D":[], "H":[], "G":[],"I":["J"], "J":["K", "L"], "K":[], "L":[]},"A", "E")
+E.reverse()
+print(E)
+'''
