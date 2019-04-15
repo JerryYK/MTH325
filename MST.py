@@ -5,6 +5,12 @@ def edge_get(graph):
         list_two.append(item[1])
     return list_two
 
+def edge_get_reverse(graph):
+    list_one = sort_edges(graph)
+    list_two = []
+    for item in list_one:
+        list_two.insert(0, item[1])
+    return list_two
 
 def sort_edges(graph):
     return_list = []
@@ -90,19 +96,18 @@ def min_prim(graph, vertex):
                 continue
     return edge_set
 
-
 def max_kruskal(graph):
-    edges = edge_get(graph)[::-1]
+    edges = edge_get_reverse(graph)
     final_answer = []
     chains = []
     for edge in edges:
         if in_chains(chains, edge) == [0, 0]:
-            chains.append(edge)
-            final_answer.append(edge.copy())
+            chains.append(edge.copy())
+            final_answer.append(edge)
         else:
             if in_chains(chains, edge)[0] == 0 or in_chains(chains, edge)[1] == 0:
-                final_answer.append(edge.copy())
-                chains.append(edge.copy)
+                final_answer.append(edge)
+                chains.append(edge.copy())
                 list_join(chains, edge[0], edge[1])
             if in_chains(chains, edge)[0] != in_chains(chains, edge)[1]:
                 final_answer.append(edge.copy())
