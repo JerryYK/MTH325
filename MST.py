@@ -113,16 +113,18 @@ def max_kruskal(graph):
     chains = []
     for edge in edges:
         if in_chains(chains, edge) == [0, 0]:
-            chains.append(edge.copy())
-            final_answer.append(edge)
+            chains.append(edge)
+            final_answer.append(edge.copy())
         else:
             if in_chains(chains, edge)[0] == 0 or in_chains(chains, edge)[1] == 0:
-                final_answer.append(edge)
-                chains.append(edge.copy())
-                list_join(chains, edge[0], edge[1])
-            if in_chains(chains, edge)[0] != in_chains(chains, edge)[1]:
                 final_answer.append(edge.copy())
+                chains.append(edge)
                 list_join(chains, edge[0], edge[1])
+            else:
+                if in_chains(chains, edge)[0] != in_chains(chains, edge)[1]:
+                    final_answer.append(edge.copy())
+                    list_join(chains, edge[0], edge[1])
+        list_join(chains, edge[1], edge[0])  # fixes formatting bugs?
     return final_answer
 
 print("edge_get: ", edge_get({"A": [["B", 10], [ "D", 5]], "B": [["A", 10], ["C", 5]], "C": [["B", 5], ["D", 15]], "D": [["C",15 ],["A", 5 ]]}))
